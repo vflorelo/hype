@@ -12,6 +12,11 @@ parser.add_argument('-f',
                     type=argparse.FileType('r'),
                     required=False,
                     help='A plain text file containing all the accession numbers in your genome/proteome')
+parser.add_argument('-w',
+                    '--web_log',
+                    type=argparse.FileType('w'),
+                    required=False,
+                    help='A handle for printing status message for the web app')
 parser.add_argument('-l',
                     '--full_gene_len',
                     type=int,
@@ -57,6 +62,11 @@ out_file       = args.out_file
 ann_source     = args.ann_source
 run_mode       = args.run_mode
 p_value        = args.p_value
+web_log        = args.web_log
+
+if( web_log != None):
+    status_str = "running"
+    web_log.write(status_str)
 ipr_full_df = pd.read_csv(tsv_file,
                           sep="\t",
                           header=None,
@@ -114,3 +124,6 @@ out_df = pd.DataFrame(out_list, columns = ["domain","status","total_domain_count
 out_df = out_df.sort_values(by=['p-val'])
 out_df["domain"] = out_df["domain"].str.replace("domain_","")
 out_df.to_csv(out_file,sep="\t",index=None)
+if( web_log != None):
+    status_str = "finished"
+    web_log.write(status_str)
