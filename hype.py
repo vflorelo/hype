@@ -67,6 +67,7 @@ web_log        = args.web_log
 if( web_log != None):
     status_str = "running"
     web_log.write(status_str)
+    web_log.close()
 ipr_full_df = pd.read_csv(tsv_file,
                           sep="\t",
                           header=None,
@@ -127,3 +128,4 @@ out_df.to_csv(out_file,sep="\t",index=None)
 if( web_log != None):
     status_str = "finished"
     web_log.write(status_str)
+    web_log.close()
