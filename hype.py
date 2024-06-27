@@ -90,22 +90,33 @@ if (  run_mode == "integrated"):
     ann_sources = ['CDD','Gene3D','PANTHER','Pfam','ProSiteProfiles','SMART','SUPERFAMILY']
     domain_df  = ipr_full_df.copy()
     domain_df  = domain_df[(domain_df["ipr_accession"] != "-") & (domain_df["ann_source"].isin(ann_sources))]
-    domain_df  = domain_df[["accession","ipr_accession"]]
+    domain_df  = domain_df[["accession","ipr_accession","ipr_description"]]
     domain_df  = domain_df.drop_duplicates()
+    desc_df    = domain_df.copy()
+    desc_df    = desc_df[["ipr_accession","ipr_description"]]
+    desc_df    = desc_df.drop_duplicates()
     domain_col = "ipr_accession"
+    desc_col   = "ipr_description"
 elif (run_mode == "normal"):
     domain_df  = ipr_full_df.copy()
     domain_df  = domain_df[domain_df["ann_source"] == ann_source]
-    domain_df  = domain_df[["accession","ann_accession"]]
+    domain_df  = domain_df[["accession","ann_accession","ann_description"]]
     domain_df  = domain_df.drop_duplicates()
+    desc_df    = domain_df.copy()
+    desc_df    = desc_df[["ann_accession","ann_description"]]
+    desc_df    = desc_df.drop_duplicates()
     domain_col = "ann_accession"
+    desc_col   = "ann_description"
 domain_df   = domain_df.rename(columns={"accession": "accession", domain_col: "domain"})
 unfold_df   = pd.get_dummies(domain_df,columns=["domain"],dtype=int)
 unfold_df   = unfold_df.drop_duplicates()
 domain_list = list(unfold_df.columns)
 domain_list.remove("accession")
+domain_list.remove(desc_col)
 out_list    = []
 for domain in domain_list:
+    domain_str = domain.replace("domain_","")
+    domain_desc  = desc_df[desc_df[domain_col]==domain_str][desc_col].values.flatten().tolist()[0]
     sub_pos_len  = len(unfold_df[(unfold_df[domain] == 1) & (unfold_df["accession"].isin(sub_gene_list)) ]["accession"].values.flatten().tolist())
     if( full_gene_len == None):
         full_pos_len = len(domain_df[(unfold_df[domain] == 1) & (unfold_df["accession"].isin(full_gene_list))]["accession"].values.flatten().tolist())
@@ -116,13 +127,13 @@ for domain in domain_list:
     sub_intv     = list(sub_hyperg.interval(0.95))
     if   ((sub_prob <= p_value ) and (sub_pos_len >= sub_intv[1])):
         status = "over"
-        sub_data = [domain,status,full_pos_len,sub_pos_len,sub_prob,sub_intv,full_gene_len,sub_gene_len]
+        sub_data = [domain,status,full_pos_len,sub_pos_len,sub_prob,sub_intv,full_gene_len,sub_gene_len,domain_desc]
         out_list.append(sub_data)
     elif ((sub_prob <= p_value ) and (sub_pos_len <= sub_intv[0])):
         status = "under"
-        sub_data = [domain,status,full_pos_len,sub_pos_len,sub_prob,sub_intv,full_gene_len,sub_gene_len]
+        sub_data = [domain,status,full_pos_len,sub_pos_len,sub_prob,sub_intv,full_gene_len,sub_gene_len,domain_desc]
         out_list.append(sub_data)
-out_df = pd.DataFrame(out_list, columns = ["domain","status","total_domain_count","subset_domain_count","p-val","ci95","total_genes","sub_genes"])
+out_df = pd.DataFrame(out_list, columns = ["domain","status","total_domain_count","subset_domain_count","p-val","ci95","total_genes","sub_genes","domain_desc"])
 out_df = out_df.sort_values(by=['p-val'])
 out_df["domain"] = out_df["domain"].str.replace("domain_","")
 out_df.to_csv(out_file,sep="\t",index=None)
