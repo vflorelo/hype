@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="js/jquery.min.js" ></script>
+  <script src="js/bootstrap.min.js" ></script>
+  <script src="js/hype.js" ></script>
+  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="css/bootstrap-icons.min.css" type="text/css" />
+  <link rel="stylesheet" href="css/jquery-ui.min.css" type="text/css" />
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <title>.:HyPE:. .:Waller Lab:.</title>
+</head>
+<body onload="resize_divs();clear_inputs();enable_upload_button('');enable_load_button('');toggle_inputs('disable')">
+<input type="hidden" id="job_id" name="job_id" />
+<div id="loading_div" name="loading_div" class="d-none position-absolute top-50 start-50 translate-middle">
+  <div class="spinner-grow text-primary" role="status"></div>
+</div>
+<div id="download_dialog" name="download_dialog" class="modal" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-center fs-3 text-bold text-white">Attention</div>
+      <div class="modal-body" name="download_dialog_message" id="download_dialog_message" ></div>
+    </div>
+  </div>
+</div>
+<div id="status_dialog" name="status_dialog" class="modal" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-center fs-3 text-bold text-white">Attention</div>
+      <div class="modal-body" name="status_dialog_message" id="status_dialog_message"></div>
+    </div>
+  </div>
+</div>
+<div name="input_div" id="input_div">
+  <div class="list-group">
+    <div id="ipr_src_div" class="list-group list-group-item" name="ipr_src_div" >
+      <div class="card">
+        <div class="card-header bg-primary text-white text-bold text-center">InterPro annotations</div>
+        <div class="card-body">
+          <div class="accordion" id="ipr_src_accordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button p-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ipr_file" aria-expanded="false" aria-controls="ipr_file">InterProScan tsv file</button>
+              </h2>
+              <div id="ipr_file" class="accordion-collapse collapse" data-bs-parent="#ipr_src_accordion">
+                <div class="accordion-body p-4">
+                  <div class="row">
+                    <div class="col-8">
+                      <input type="file" class="form-control form-control-sm" id="ipr_file_input" name="ipr_file_input" onchange="enable_upload_button(this.value)"/>
+                    </div>
+                    <div class="col-4">
+                      <button type="button" class="btn btn-secondary" id="upload_button" name="upload_button" disabled>
+                        <span class="bi bi-upload"></span>
+                      </button>
+                    </div>
+                  </div>
+                  <p class="font-monospace alert p-1" role="alert"  id="ipr_file_status" name="ipr_file_status"></p>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button p-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ipr_pre_file" aria-expanded="false" aria-controls="ipr_pre_file">Existing job ID</button>
+              </h2>
+              <div id="ipr_pre_file" class="accordion-collapse collapse" data-bs-parent="#ipr_src_accordion">
+                <div class="accordion-body p-4">
+                  <div class="row">
+                    <div class="col-8">
+                      <input class="form-control form-control-sm" type="text" id="ipr_pre_file_input" name="ipr_pre_file_input" oninput="enable_load_button(this.value)"/>
+                    </div>
+                    <div class="col-4">
+                      <button type="button" class="btn btn-primary" id="load_button" name="load_button" onclick="get_job()">
+                        <span class="bi bi-check2-circle"></span>
+                      </button>
+                    </div>
+                  </div>
+                  <p class="font-monospace alert p-1" role="alert"  id="ipr_pre_file_status" name="ipr_pre_file_status"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="ann_sources_div" class="list-group list-group-item" name="ann_sources_div" >
+      <div class="card">
+        <div class="card-header bg-info text-dark text-bold text-center">Run mode</div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-6">
+              <label class="control-label font-weight-bold" for="ann_source">Annotation source</label>
+              <select name="ann_source" id="ann_source" class="form-select form-select-sm" onchange="verify_form()">
+                <option value=""></option>
+                <option value="Pfam">Pfam</option>
+                <option value="PANTHER">PANTHER</option>
+                <option value="CDD">CDD</option>
+                <option value="Gene3D">Gene3D</option>
+                <option value="ProSiteProfiles">ProSiteProfiles</option>
+                <option value="SMART">SMART</option>
+                <option value="SUPERFAMILY">SUPERFAMILY</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="control-label font-weight-bold" for="switch_div">Integrated domains</label>
+              <div class="form-check form-switch" id="switch_div" name="switch_div">
+                <input type="checkbox" class="form-check-input" id="run_mode" >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="gene_list_div" class="list-group list-group-item" name="gene_list_div" >
+      <div class="card">
+        <div class="card-header bg-warning text-dark text-bold text-center">Background</div>
+        <div class="card-body">
+          <div class="accordion" id="gene_list_accordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button p-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gene_list_file" aria-expanded="false" aria-controls="gene_list_file">Gene list file</button>
+              </h2>
+              <div id="gene_list_file" class="accordion-collapse collapse" data-bs-parent="#gene_list_accordion">
+                <div class="accordion-body p-4">
+                  <input type="file" class="form-control form-control-sm" id="gene_list_file_input" name="gene_list_file_input" onchange="verify_form()" />
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button p-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gene_list_count" aria-expanded="false" aria-controls="gene_list_count">Total gene count</button>
+              </h2>
+              <div id="gene_list_count" class="accordion-collapse collapse" data-bs-parent="#gene_list_accordion">
+                <div class="accordion-body p-4">
+                  <input class="form-control form-control-sm" type="number" id="gene_list_count_input" onchange="verify_form()" min="1" max="1000000000">
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button p-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gene_list" aria-expanded="false" aria-controls="gene_list">Total gene list</button>
+              </h2>
+              <div id="gene_list" class="accordion-collapse collapse" data-bs-parent="#gene_list_accordion">
+                <div class="accordion-body p-4">
+                  <textarea class="form-control form-control-sm" id="gene_list_input" onchange="verify_form()"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="gene_set_div" class="list-group list-group-item" name="gene_set_div" >
+      <div class="card">
+        <div class="card-header bg-success text-white text-bold text-center">Gene set</div>
+        <div class="card-body">
+          <div class="accordion" id="gene_set_accordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button p-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gene_set_file" aria-expanded="false" aria-controls="gene_set_file">Gene set list file</button>
+              </h2>
+              <div id="gene_set_file" class="accordion-collapse collapse" data-bs-parent="#gene_set_accordion">
+                <div class="accordion-body p-4">
+                  <input type="file" class="form-control form-control-sm" id="gene_set_file_input" name="gene_set_file_input" onchange="verify_form()" />
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button p-2 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gene_set_list" aria-expanded="false" aria-controls="gene_set_list">Gene set list</button>
+              </h2>
+              <div id="gene_set_list" class="accordion-collapse collapse" data-bs-parent="#gene_set_accordion">
+                <div class="accordion-body p-4">
+                  <textarea class="form-control form-control-sm" id="gene_set_list_input" onchange="verify_form()"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="hype_button_div" class="list-group list-group-item" name="hype_button_div" >
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-6">
+              <button type="button" class="btn btn-success form-control" id="hype_button" name="hype_button" disabled >HyPE!</button>
+            </div>
+            <div class="col-6">
+              <button type="button" class="btn btn-danger form-control" id="reset_button" name="reset_button" onclick="reset()">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div name="results_div" id="results_div">
+  <div class="accordion d-none" id="results_accordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed text-white text-bold bg-info" type="button" data-bs-toggle="collapse" data-bs-target="#summary_accordion_item" aria-expanded="false" aria-controls="summary_accordion_item">Summary</button>
+      </h2>
+      <div id="summary_accordion_item" class="accordion-collapse collapse" data-bs-parent="#results_accordion">
+        <div class="accordion-body" id="results_summary" name="results_summary"></div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed text-white text-bold bg-primary" type="button" data-bs-toggle="collapse" data-bs-target="#over_accordion_item" aria-expanded="false" aria-controls="over_accordion_item">Enriched domains</button>
+      </h2>
+      <div id="over_accordion_item" class="accordion-collapse collapse" data-bs-parent="#results_accordion">
+        <div class="accordion-body" id="over_list" name="over_list"></div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed text-white text-bold bg-danger" type="button" data-bs-toggle="collapse" data-bs-target="#under_accordion_item" aria-expanded="false" aria-controls="under_accordion_item">Purified domains</button>
+      </h2>
+      <div id="under_accordion_item" class="accordion-collapse collapse" data-bs-parent="#results_accordion">
+        <div class="accordion-body" id="under_list" name="under_list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div name="info_div" id="info_div">
+</div>
+</body>
+</html>
