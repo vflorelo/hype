@@ -363,6 +363,7 @@ function get_hype_results(job_id,ann_source,run_mode){
 				let bg_count ;
 				let set_count ;
 				let pvalue ;
+				let qvalue ;
 				let min_exp ;
 				let max_exp ;
 				let bg_full_count  = $xml_data.find("bg_full_count").text();
@@ -388,6 +389,7 @@ function get_hype_results(job_id,ann_source,run_mode){
 					bg_count       = parseInt($(this).find("bg_count").text());
 					set_count      = parseInt($(this).find("set_count").text());
 					pvalue         = parseFloat($(this).find("pvalue").text()).toFixed(2);
+					qvalue         = parseFloat($(this).find("qvalue").text()).toFixed(2);
 					min_exp        = parseInt($(this).find("min_exp").text());
 					max_exp        = parseInt($(this).find("max_exp").text());
 					bg_full_count  = parseInt($(this).find("bg_full_count").text());
@@ -404,6 +406,7 @@ function get_hype_results(job_id,ann_source,run_mode){
 										 "  <span class='badge text-bg-secondary rounded-pill' title='Minimum expected count'>"+min_exp+"</span>\n"+
 										 "  <span class='badge text-bg-primary   rounded-pill' title='Maximum expected count'>"+max_exp+"</span>\n"+
 										 "  <span class='badge text-bg-warning   rounded-pill' title='p-value'>"+pvalue+"</span>\n"+
+										 "  <span class='badge text-bg-warning   rounded-pill' title='q-value'>"+qvalue+"</span>\n"+
 										 "</div>\n";
 						}
 					else if(status=="under"){
@@ -417,6 +420,7 @@ function get_hype_results(job_id,ann_source,run_mode){
 										  "  <span class='badge text-bg-secondary rounded-pill' title='Minimum expected count'>"+min_exp+"</span>\n"+
 										  "  <span class='badge text-bg-primary   rounded-pill' title='Maximum expected count'>"+max_exp+"</span>\n"+
 										  "  <span class='badge text-bg-warning   rounded-pill' title='p-value'>"+pvalue+"</span>\n"+
+										  "  <span class='badge text-bg-warning   rounded-pill' title='q-value'>"+qvalue+"</span>\n"+
 										  "</div>\n";
 						}
 					});

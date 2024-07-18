@@ -15,7 +15,7 @@ $hype_status_file = "./$job_id/$job_id.status.txt" ;
 $hype_log_file    = "./$job_id/$job_id.log" ;
 $hype_err_file    = "./$job_id/$job_id.err" ;
 $query_str        = 0 ;
-$hype_cmd_str     = "hype.py --p_value 0.05 --out_file $hype_file_name --tsv_file $ipr_tsv_file --web_log $hype_status_file ";
+$hype_cmd_str     = "hype.py --crit p-value --q_value 0.05 --p_value 0.05 --out_file $hype_file_name --tsv_file $ipr_tsv_file --web_log $hype_status_file ";
 if(file_exists($ipr_tsv_file)){
     switch($gene_list_eval){
         case "1":

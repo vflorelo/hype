@@ -1,7 +1,10 @@
 #!/usr/bin/python3
 import argparse
 import pandas  as pd
-from   scipy.stats import hypergeom
+from   decimal                     import Decimal
+from   scipy.stats                 import hypergeom
+from   statsmodels.stats.multitest import fdrcorrection
+
 parser = argparse.ArgumentParser(prog="hype.py",
                                  description="A simple program to calculate over or under representation of functional domains",
                                  epilog="""LICENSE:
@@ -49,21 +52,33 @@ parser.add_argument('-m',
                     required=True,
                     help='Set this option to "integrated" if you want to perform enrichment of integrated interpro signatures or to "normal" if you want to analyse individual annotation sources, not compatible with --ann_source',
                     choices=["normal","integrated"])
+parser.add_argument('-q',
+                    '--q_value',
+                    type=float,
+                    default=0.05,
+                    help='Adjust the q-value cutoff for significantly under-/over-represented domains')
 parser.add_argument('-p',
                     '--p_value',
                     type=float,
                     default=0.05,
                     help='Adjust the p-value cutoff for significantly under-/over-represented domains')
-args           = parser.parse_args()
-tsv_file       = args.tsv_file
-full_gene_len  = args.full_gene_len
-sub_gene_list  = args.sub_gene_list
-out_file       = args.out_file
-ann_source     = args.ann_source
-run_mode       = args.run_mode
-p_value        = args.p_value
-web_log        = args.web_log
-
+parser.add_argument('-c',
+                    '--crit',
+                    type=str,
+                    required=True,
+                    help='Whether to use p-value or q-value as filtering criteria',
+                    choices=['q-value','p-value'])
+args          = parser.parse_args()
+tsv_file      = args.tsv_file
+full_gene_len = args.full_gene_len
+sub_gene_list = args.sub_gene_list
+out_file      = args.out_file
+ann_source    = args.ann_source
+run_mode      = args.run_mode
+q_value       = args.q_value
+p_value       = args.p_value
+web_log       = args.web_log
+crit          = args.crit
 if( web_log != None):
     f = open(web_log, "w")
     status_str = "running"
@@ -125,18 +140,29 @@ for domain in domain_list:
     sub_hyperg   = hypergeom(full_gene_len, full_pos_len, sub_gene_len)
     sub_prob     = sub_hyperg.pmf(sub_pos_len)
     sub_intv     = list(sub_hyperg.interval(0.95))
-    if   ((sub_prob <= p_value ) and (sub_pos_len >= sub_intv[1])):
+    if   ((sub_pos_len > sub_intv[0]) and (sub_pos_len < sub_intv[1])):
+        status = "within"
+    elif (sub_pos_len >= sub_intv[1]):
         status = "over"
-        sub_data = [domain,status,full_pos_len,sub_pos_len,sub_prob,sub_intv,full_gene_len,sub_gene_len,domain_desc]
-        out_list.append(sub_data)
-    elif ((sub_prob <= p_value ) and (sub_pos_len <= sub_intv[0])):
+    elif (sub_pos_len <= sub_intv[0]):
         status = "under"
-        sub_data = [domain,status,full_pos_len,sub_pos_len,sub_prob,sub_intv,full_gene_len,sub_gene_len,domain_desc]
-        out_list.append(sub_data)
+    sub_data = [domain,status,full_pos_len,sub_pos_len,sub_prob,sub_intv,full_gene_len,sub_gene_len,domain_desc]
+    out_list.append(sub_data)
 out_df = pd.DataFrame(out_list, columns = ["domain","status","total_domain_count","subset_domain_count","p-val","ci95","total_genes","sub_genes","domain_desc"])
-out_df = out_df.sort_values(by=['p-val'])
-out_df["domain"] = out_df["domain"].str.replace("domain_","")
-out_df.to_csv(out_file,sep="\t",index=None)
+pvals = out_df["p-val"].values.flatten().tolist()
+qvals = list(fdrcorrection(pvals, alpha=0.05, method='indep', is_sorted=False)[1])
+out_df['q-val'] = qvals
+filt_df = out_df.copy()
+if (crit == "q-value"):
+    filt_df = filt_df[(filt_df["status"]!="within") & (filt_df["q-val"]<=q_value)]
+elif (crit == "p-value"):
+    filt_df = filt_df[(filt_df["status"]!="within") & (filt_df["p-val"]<=p_value)]
+filt_df = filt_df.sort_values(by=['q-val'])
+filt_df["domain"] = filt_df["domain"].str.replace("domain_","")
+filt_df["p-val"] = filt_df["p-val"].apply(lambda x: '%.3E' % Decimal(x))
+filt_df["q-val"] = filt_df["q-val"].apply(lambda x: '%.3E' % Decimal(x))
+columns = ["domain","status","total_domain_count","subset_domain_count","p-val","q-val","ci95","total_genes","sub_genes","domain_desc"]
+filt_df[columns].to_csv(out_file,sep="\t",index=None)
 if( web_log != None):
     f = open(web_log, "w")
     status_str = "finished"

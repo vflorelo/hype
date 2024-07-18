@@ -35,9 +35,10 @@ if(file_exists($hype_tsv_file)){
             $bg_count       = $cur_row_arr[2];
             $set_count      = $cur_row_arr[3];
             $pvalue         = $cur_row_arr[4];
-            $description    = $cur_row_arr[8];
+            $qvalue         = $cur_row_arr[5];
+            $description    = $cur_row_arr[9];
             $description    = htmlentities($description, ENT_QUOTES);
-            $interval       = $cur_row_arr[5];
+            $interval       = $cur_row_arr[6];
             $interval       = str_replace("[","",$interval);
             $interval       = str_replace("]","",$interval);
             $interval       = str_replace(" ","",$interval);
@@ -50,6 +51,7 @@ if(file_exists($hype_tsv_file)){
                               "    <bg_count>$bg_count</bg_count>\n".
                               "    <set_count>$set_count</set_count>\n".
                               "    <pvalue>$pvalue</pvalue>\n".
+                              "    <qvalue>$qvalue</qvalue>\n".
                               "    <description>$description</description>\n".
                               "    <min_exp>$min_exp</min_exp>\n".
                               "    <max_exp>$max_exp</max_exp>\n".
