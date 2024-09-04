@@ -17,7 +17,7 @@ if(file_exists($hype_tsv_file)){
     $hype_tsv_str   = file_get_contents($hype_tsv_file);
     $hype_row_arr   = explode("\n", $hype_tsv_str);
     $hype_row_count = count($hype_row_arr);
-    $xml_str       .= "  <row_count>$hype_row_count</row_count>";
+    $xml_str       .= "  <row_count>$hype_row_count</row_count>\n";
     if($hype_row_count >= 2){
         $tmp_row_str = $hype_row_arr[1] ;
         $tmp_row_arr = explode("\t",$tmp_row_str);
