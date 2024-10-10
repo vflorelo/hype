@@ -368,10 +368,14 @@ function get_hype_results(job_id,ann_source,run_mode){
 				let max_exp ;
 				let bg_full_count  = $xml_data.find("bg_full_count").text();
 				let set_full_count = $xml_data.find("set_full_count").text();
+				let over_count     = $xml_data.find("over_count").text();
+				let under_count     = $xml_data.find("under_count").text();
 				let sum_html_str   = "<div class='list-group'>\n"+
 									 "  <div class='list-group-item'>Annotation source: "+ann_source+"</div>\n"+
 									 "  <div class='list-group-item'>Full set size: "+bg_full_count+"</div>\n"+
 									 "  <div class='list-group-item'>Sub-set size: "+set_full_count+"</div>\n"+
+									 "  <div class='list-group-item'>Over-represented domains: "+over_count+"</div>\n"+
+									 "  <div class='list-group-item'>Under-represented domains: "+under_count+"</div>\n"+
 									 "  <div class='list-group-item'>Tabular results "+
 									 "    <span class='badge text-bg-primary rounded-pill' onclick='download_results(\""+job_id+"\",\""+ann_source+"\",\""+run_mode+"\")'>\n"+
 									 "      <span class='bi bi-download' title='Click here to download your enrichment results'></span>\n"+

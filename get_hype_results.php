@@ -21,17 +21,25 @@ if(file_exists($hype_tsv_file)){
     if($hype_row_count >= 2){
         $tmp_row_str = $hype_row_arr[1] ;
         $tmp_row_arr = explode("\t",$tmp_row_str);
-        $bg_full_count  = $tmp_row_arr[6];
-        $set_full_count = $tmp_row_arr[7];
+        $bg_full_count  = $tmp_row_arr[7];
+        $set_full_count = $tmp_row_arr[8];
         $xml_str .= "  <bg_full_count>$bg_full_count</bg_full_count>\n".
                     "  <set_full_count>$set_full_count</set_full_count>\n";
         $query_str = $query_str + 0 ;
         $inner_xml_str .= "  <domain_count>$hype_row_count</domain_count>\n";
+        $over_count  = 0 ;
+        $under_count = 0 ;
         for ($row_num = 1 ; $row_num < $hype_row_count ; $row_num++) {
             $cur_row_str    = $hype_row_arr[$row_num];
             $cur_row_arr    = explode("\t",$cur_row_str);
             $accession      = $cur_row_arr[0];
             $status         = $cur_row_arr[1];
+            if($status=="over"){
+                $over_count += 1 ;
+                }
+            if($status=="under"){
+                $under_count += 1;
+                }
             $bg_count       = $cur_row_arr[2];
             $set_count      = $cur_row_arr[3];
             $pvalue         = $cur_row_arr[4];
@@ -57,6 +65,8 @@ if(file_exists($hype_tsv_file)){
                               "    <max_exp>$max_exp</max_exp>\n".
                               "  </entry>\n";
             }
+        $inner_xml_str .= "  <over_count>$over_count</over_count>\n";
+        $inner_xml_str .= "  <under_count>$under_count</under_count>\n";
         }
     else{
         $query_str = $query_str + 1 ;
