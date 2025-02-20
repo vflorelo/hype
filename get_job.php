@@ -1,7 +1,7 @@
 <?php
-#error_reporting(E_ALL);
-#ini_set('display_errors', TRUE);
-#ini_set('display_startup_errors', TRUE);
+error_reporting(E_ALL);
+ini_set('display_errors', TRUE);
+ini_set('display_startup_errors', TRUE);
 $job_id    = $_POST["job_id"];
 $ipr_file  = "./$job_id/$job_id.ipr.tsv";
 if(file_exists($ipr_file)){

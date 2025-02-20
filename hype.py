@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import argparse
 import pandas  as pd
+import numpy   as np
 from   decimal                     import Decimal
 from   scipy.stats                 import hypergeom
 from   statsmodels.stats.multitest import fdrcorrection
@@ -139,7 +140,9 @@ for domain in domain_list:
         full_pos_len = len(domain_df[unfold_df[domain] == 1]["accession"].values.flatten().tolist())
     sub_hyperg   = hypergeom(full_gene_len, full_pos_len, sub_gene_len)
     sub_prob     = sub_hyperg.pmf(sub_pos_len)
-    sub_intv     = list(sub_hyperg.interval(0.95))
+    sub_tmp_intv = sub_hyperg.interval(0.95)
+    
+    sub_intv     = [sub_tmp_intv[0].item(),sub_tmp_intv[1].item()]
     if   ((sub_pos_len > sub_intv[0]) and (sub_pos_len < sub_intv[1])):
         status = "within"
     elif (sub_pos_len >= sub_intv[1]):

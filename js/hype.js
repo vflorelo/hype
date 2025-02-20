@@ -336,7 +336,7 @@ function get_hype_results(job_id,ann_source,run_mode){
 			toggle_spinner("stop");
 			let response_xml = get_hype_results.responseText ;
 			let xml_data     = $.parseXML(response_xml);
-			$xml_data        = $(xml_data);
+			let $xml_data    = $(xml_data);
 			let query_str    = $xml_data.find("query_str").text();
 			let ann_source   = $xml_data.find("ann_source").text();
 			let run_mode     = $xml_data.find("run_mode").text();
@@ -369,7 +369,7 @@ function get_hype_results(job_id,ann_source,run_mode){
 				let bg_full_count  = $xml_data.find("bg_full_count").text();
 				let set_full_count = $xml_data.find("set_full_count").text();
 				let over_count     = $xml_data.find("over_count").text();
-				let under_count     = $xml_data.find("under_count").text();
+				let under_count    = $xml_data.find("under_count").text();
 				let sum_html_str   = "<div class='list-group'>\n"+
 									 "  <div class='list-group-item'>Annotation source: "+ann_source+"</div>\n"+
 									 "  <div class='list-group-item'>Full set size: "+bg_full_count+"</div>\n"+
@@ -382,8 +382,8 @@ function get_hype_results(job_id,ann_source,run_mode){
 									 "    </span>\n"+
 									 "  </div>\n"+
 									 "</div>\n";
-				let over_html_str  = "<div class='list-group'>\n";
-				let under_html_str = "<div class='list-group'>\n";
+				let over_html_str  = "<div>\n";
+				let under_html_str = "<div>\n";
 				$xml_data.find("entry").each(function (){
 					counter       += 1 ;
 					accession      = $(this).find("accession").text();
@@ -392,39 +392,51 @@ function get_hype_results(job_id,ann_source,run_mode){
 					status         = $(this).find("status").text();
 					bg_count       = parseInt($(this).find("bg_count").text());
 					set_count      = parseInt($(this).find("set_count").text());
-					pvalue         = parseFloat($(this).find("pvalue").text()).toFixed(2);
-					qvalue         = parseFloat($(this).find("qvalue").text()).toFixed(2);
+					pvalue         = parseFloat($(this).find("pvalue").text()).toFixed(4);
+					qvalue         = parseFloat($(this).find("qvalue").text()).toFixed(4);
 					min_exp        = parseInt($(this).find("min_exp").text());
 					max_exp        = parseInt($(this).find("max_exp").text());
 					bg_full_count  = parseInt($(this).find("bg_full_count").text());
 					set_full_count = parseInt($(this).find("set_full_count").text());
 					link_target    = base_url + accession ;
 					if(status=="over"){
-						over_html_str += "<div class='list-group-item d-flex justify-content-between align-items-start fs-5'>\n"+
-										 "  <div class='ms-2 me-auto'>\n"+
-										 "    <div class='fw-bold'><a href='"+link_target+"' target='_blank'>"+accession+" <span class='bi bi-box-arrow-up-right'></span></a></div>"+desc_dec_str+
+						over_html_str += "<div class='card'>\n"+
+						                 "  <div class='card-header fs-5 text-bold text-center'>\n"+
+										 "    <a href='"+link_target+"' target='_blank'>"+accession+"<span class='bi bi-box-arrow-up-right'></span></a>\n"+
 										 "  </div>\n"+
-										 "  <span class='badge text-bg-info      rounded-pill' title='Click here for more info' onclick=\"get_domain_info('"+accession+"','"+ann_source+"','"+run_mode+"')\"><span class='bi bi-search'></span></span>\n"+
-										 "  <span class='badge text-bg-dark      rounded-pill' title='Domain count in full set'>"+bg_count+"</span>\n"+
-										 "  <span class='badge text-bg-success   rounded-pill' title='Domain count in sub-set'>"+set_count+"</span>\n"+
-										 "  <span class='badge text-bg-secondary rounded-pill' title='Minimum expected count'>"+min_exp+"</span>\n"+
-										 "  <span class='badge text-bg-primary   rounded-pill' title='Maximum expected count'>"+max_exp+"</span>\n"+
-										 "  <span class='badge text-bg-warning   rounded-pill' title='p-value'>"+pvalue+"</span>\n"+
-										 "  <span class='badge text-bg-warning   rounded-pill' title='q-value'>"+qvalue+"</span>\n"+
+										 "  <div class='card-body'>\n"+
+										 "    <div class='alert alert-success'>"+
+										 "      <div class='fs-5 d-flex justify-content-between align-items-start fs-5'>"+desc_dec_str+
+										 "        <span class='badge text-bg-primary rounded-pill' onclick=\"get_domain_info('"+accession+"','"+ann_source+"','"+run_mode+"')\">\n"+
+										 "        <span class='bi bi-search'></span></span>\n"+
+										 "      </div>\n"+
+										 "      <div class='list-group fs-6'>\n"+
+										 "        <div class='list-group-item'>Domain counts. Full set: "+bg_count+", gene set: "+set_count+"</div>\n"+
+										 "        <div class='list-group-item'>Expected interval: ["+min_exp+" - "+max_exp+"]</div>\n"+
+										 "        <div class='list-group-item'>p-value: "+pvalue+", q-value: "+qvalue+"</div>\n"+
+										 "      </div>\n"+
+										 "    </div>\n"+
+										 "  </div>\n"+
 										 "</div>\n";
 						}
 					else if(status=="under"){
-						under_html_str += "<div class='list-group-item d-flex justify-content-between align-items-start fs-5'>\n"+
-										  "  <div class='ms-2 me-auto'>\n"+
-										  "    <div class='fw-bold'><a href='"+link_target+"' target='_blank'>"+accession+" <span class='bi bi-box-arrow-up-right'></span></a></div>"+desc_dec_str+
+						under_html_str += "<div class='card'>\n"+
+						                  "  <div class='card-header fs-5 text-bold text-center'>\n"+
+										  "    <a href='"+link_target+"' target='_blank'>"+accession+"<span class='bi bi-box-arrow-up-right'></span></a>\n"+
 										  "  </div>\n"+
-										  "  <span class='badge text-bg-info      rounded-pill' title='Click here for more info' onclick=\"get_domain_info('"+accession+"','"+ann_source+"','"+run_mode+"')\"><span class='bi bi-search'></span></span>\n"+
-										  "  <span class='badge text-bg-dark      rounded-pill' title='Domain count in full set'>"+bg_count+"</span>\n"+
-										  "  <span class='badge text-bg-danger    rounded-pill' title='Domain count in sub-set'>"+set_count+"</span>\n"+
-										  "  <span class='badge text-bg-secondary rounded-pill' title='Minimum expected count'>"+min_exp+"</span>\n"+
-										  "  <span class='badge text-bg-primary   rounded-pill' title='Maximum expected count'>"+max_exp+"</span>\n"+
-										  "  <span class='badge text-bg-warning   rounded-pill' title='p-value'>"+pvalue+"</span>\n"+
-										  "  <span class='badge text-bg-warning   rounded-pill' title='q-value'>"+qvalue+"</span>\n"+
+										  "  <div class='card-body'>\n"+
+										  "    <div class='alert alert-danger'>"+
+										  "      <div class='fs-5 d-flex justify-content-between align-items-start fs-5'>"+desc_dec_str+
+										  "        <span class='badge text-bg-warning rounded-pill' onclick=\"get_domain_info('"+accession+"','"+ann_source+"','"+run_mode+"')\">\n"+
+										  "        <span class='bi bi-search'></span></span>\n"+
+										  "      </div>\n"+
+										  "      <div class='list-group fs-6'>\n"+
+										  "        <div class='list-group-item'>Domain counts. Full set: "+bg_count+", gene set: "+set_count+"</div>\n"+
+										  "        <div class='list-group-item'>Expected interval: ["+min_exp+" - "+max_exp+"]</div>\n"+
+										  "        <div class='list-group-item'>p-value: "+pvalue+", q-value: "+qvalue+"</div>\n"+
+										  "      </div>\n"+
+										  "    </div>\n"+
+										  "  </div>\n"+
 										  "</div>\n";
 						}
 					});
@@ -530,7 +542,7 @@ function get_domain_info(accession,ann_source,run_mode){
 			}
 		}
 	let html_str = "<div class='card h-100 overflow-scroll'>\n"+
-	               "  <div class='card-header bg-primary text-white text-bold text-center fs-3'>"+accession+"</div>\n"+
+	               "  <div class='card-header bg-primary text-white text-bold text-center fs-5'>"+accession+"</div>\n"+
 				   "  <div class='card-body overflow-scroll'>\n";
 	let api_url = base_url + accession ;
 	$.getJSON(api_url).done(function(data){
@@ -540,7 +552,7 @@ function get_domain_info(accession,ann_source,run_mode){
 			let lit_obj  = metainfo.literature;
 			if (desc_obj !== null){
 				let desc_str = desc_obj[0].text;
-				html_str    += "    <div class='h-25 overflow-scroll alert alert-primary fs-4'>"+desc_str+"</div>\n";
+				html_str    += "    <div class='h-25 overflow-scroll alert alert-primary fs-6'>"+desc_str+"</div>\n";
 				}
 			if(lit_obj !== null){
 				html_str += "    <div class='overflow-scroll list-group'>\n";
@@ -550,12 +562,20 @@ function get_domain_info(accession,ann_source,run_mode){
 					let lit_pmid    = lit_obj[lit_key].PMID;
 					let lit_doi_url = lit_obj[lit_key].DOI_URL;
 					let lit_pm_url  = "https://pubmed.ncbi.nlm.nih.gov/"+lit_pmid;
-					html_str += "      <div class='list-group list-group-item fs-5'>"+
+					html_str += "      <div class='list-group list-group-item fs-6'>"+
 					            "        <div class='ms-2 me-auto'>\n"+
 								"          <div class='fw-bold'>"+lit_title+"</div>\n"+
 								"        </div>\n"+
-								"        <a class='badge text-bg-primary rounded-pill' href='"+lit_pm_url+"'  target='_blank'><span title='PubMed' class='bi bi-book-fill'></span></a>\n"+
-								"        <a class='badge text-bg-success rounded-pill' href='"+lit_doi_url+"' target='_blank'><span title='DOI'    class='bi bi-book-fill'></span></a>\n"+
+								"        <div class='ms-2 me-auto'>\n"+
+								"          <div class='fw-bold'>PubMed link:\n"+
+								"            <a class='badge text-bg-primary rounded-pill' href='"+lit_pm_url+"'  target='_blank'><span class='bi bi-book-fill'></span></a>\n"+
+								"          </div>\n"+
+								"        </div>\n"+
+								"        <div class='ms-2 me-auto'>\n"+
+								"          <div class='fw-bold'>DOI link:\n"+
+								"            <a class='badge text-bg-success rounded-pill' href='"+lit_doi_url+"' target='_blank'><span class='bi bi-book-fill'></span></a>\n"+
+								"          </div>\n"+
+								"        </div>\n"+
 								"      </div>\n";
 					}
 				html_str += "    </div>\n";
