@@ -49,5 +49,6 @@ then
     echo "Missing output file name. Exiting"
     exit 1
 fi
-datablock=$(awk -v e_value="${e_value}" 'BEGIN{FS="\t";OFS="\t";dot="."}{if($9<=e_value){print $1,dot,dot,$4,$5,$6,dot,dot,dot,dot,dot,$12,$13}}' ${tsv_file} | sort -V | uniq)
+ann_sources=$(echo -e "CDD\nGene3D\nPANTHER\nPfam\nProSiteProfiles\nSMART\nSUPERFAMILY")
+datablock=$(grep -wFf  <(echo "${ann_sources}") ${tsv_file} | awk -v e_value="${e_value}" 'BEGIN{FS="\t";OFS="\t";dot="."}{if($9<=e_value){print $1,dot,dot,$4,$5,$6,dot,dot,dot,dot,dot,$12,$13}}' | sort -V | uniq)
 echo "${datablock}" > ${out_file}
