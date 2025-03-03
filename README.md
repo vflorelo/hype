@@ -9,20 +9,18 @@ Protein domains on the other hand, provide a robust, albeit more granular, frame
 
 There are readily available tools for gene enrichment analysis based on gene ontologies, however, the same is not true for protein domains.
 
-Here we present HyPE (Hypergeometric Protein-domain Enrichment), a simple tool for performing genome-wide analysis of enrichment (or purification) of domains using the output of interproscan. HyPE can be used directly from the command line as a python program, but it can also be accessed through our webserver ([www.atglabs.org/hype](www.atglabs.org/hype))
+Here we present HyPE (Hypergeometric Protein-domain Enrichment), a simple tool for performing genome-wide analysis of enrichment (or purification) of domains using the output of interproscan.
+
+HyPE can be used directly from the command line as a python program, but it can also be accessed through our webserver ([www.atglabs.org/hype](www.atglabs.org/hype))
 
 The use of protein domains offers some advantages over the use of gene ontologies, to name a few:
 
-- Protein domains are easier to detect using standard tools
+- Protein domains are easier to detect using standard tools like [InterProScan](https://www.ebi.ac.uk/interpro/), [Panther score](https://pantherdb.org/) and [PANNZER2](http://ekhidna2.biocenter.helsinki.fi/sanspanz/) 
 - Protein domains do not depend on hierarchical classification schemes
+- Protein domains are model- and taxonomy-agnostic
 
-Protein domains can be detected using robust tools such as InterProScan, PantherScore and PANNZER. The functional domains detected using such tools can be used for performing enrichment analyses.
-
-For any given protein domain, HyPE calculates a 95% confidence interval based on a hypergeometric distribution, it then compares the number of times the protein domain was found in the background set (the whole proteome) and how many times the domain was found in the testing set (e.g. a list of differentially expressed genes). HyPE then calculates the p-value of a protein domain being under- or over-represented (i.e. it was detected fewer, or more times than what is expected by chance given the 95% CI).
+For any given protein domain that is found in the proteome, genome or transcriptome of an organism, HyPE calculates a 95% confidence interval based on a hypergeometric distribution, it then compares the number of times the protein domain was found in the background set (the whole proteome) and how many times the domain was found in the testing set (e.g. a list of differentially expressed genes). HyPE then calculates the adjusted p-value (q-value) of a protein domain being under- or over-represented (i.e. it was detected fewer, or more times than what is expected by chance given the 95% CI).
 
 With HyPE, it is possible to detect statistically significant protein domains that might reflect the biological significance of a gene being differentially expressed, without relying on gene ontologies (or their lack thereof).
 
-We compared the number of significantly enriched or purified terms obtained with readily available tools such as GOATools and BiNGO, applied to annotations coming from model and non-model organisms. In all cases, HyPE detected more terms than BiNGO or GOATools, but the differences were more marked when analysing non-model organisms (Figure XXX).
-
-In addition, the functional domains found using HyPE, shed some light on molecular functions that were otherwise overlooked by GOATools or BiNGO (Table XXX).
-
+As of now, HyPE works with files produced by InterProScan, future releases of HyPE will include modules for processing annotations from other sources
