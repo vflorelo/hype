@@ -11,7 +11,7 @@ There are readily available tools for gene enrichment analysis based on gene ont
 
 Here we present HyPE (Hypergeometric Protein-domain Enrichment), a simple tool for performing genome-wide analysis of enrichment (or purification) of domains using the output of interproscan.
 
-HyPE can be used directly from the command line as a python program, but it can also be accessed through our webserver ([www.atglabs.org/hype](www.atglabs.org/hype))
+HyPE can be used directly from the command line as a python program, but it can also be accessed through our webserver ([www.atglabs.org/hype](https://www.atglabs.org/hype))
 
 The use of protein domains offers some advantages over the use of gene ontologies, to name a few:
 
